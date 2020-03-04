@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "StepParser": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\stp\\test.stp"
+    }
+  }
+}
