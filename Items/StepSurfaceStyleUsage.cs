@@ -31,17 +31,19 @@ namespace StepParser.Items
             surfaceStyleUsage.Id = id;
             surfaceStyleUsage.Side = syntaxList.Values[0].GetEnumerationValue();
 
-            binder.BindValue(syntaxList.Values[1], v => surfaceStyleUsage.SurfaceSideStyle = v.AsType<StepSurfaceSideStyle>());
-
+            //binder.BindValue(syntaxList.Values[1], v => surfaceStyleUsage.SurfaceSideStyle = v.AsType<StepSurfaceSideStyle>());
+            surfaceStyleUsage.BindSyntaxList(binder, syntaxList, 1);
             return surfaceStyleUsage;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
+            writer.WriteStartElement("SurfaceStyleUsage");
             writer.WriteAttributeString("type", ItemType.GetItemTypeString());
             writer.WriteAttributeString("side", Side);
-            writer.WriteStartElement("Styles");
-            SurfaceSideStyle.WriteXML(writer);
+            //writer.WriteStartElement("Styles");
+            //SurfaceSideStyle.WriteXML(writer);
+            base.WriteXML(writer);
             writer.WriteEndElement();
         }
     }

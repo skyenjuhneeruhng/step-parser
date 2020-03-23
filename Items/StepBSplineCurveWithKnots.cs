@@ -82,12 +82,13 @@ namespace StepParser.Items
             yield return new StepEnumerationValueSyntax(GetKnotSpec(KnotSpec));
         }
 
-        internal static StepBSplineCurveWithKnots CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepBSplineCurveWithKnots CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             syntaxList.AssertListCount(9);
             var controlPointsList = syntaxList.Values[2].GetValueList();
 
             var spline = new StepBSplineCurveWithKnots(string.Empty, new StepCartesianPoint[controlPointsList.Values.Count]);
+            spline.Id = id;
             spline.Name = syntaxList.Values[0].GetStringValue();
             spline.Degree = syntaxList.Values[1].GetIntegerValue();
 
@@ -96,6 +97,7 @@ namespace StepParser.Items
                 var j = i; // capture to avoid rebinding
                 binder.BindValue(controlPointsList.Values[j], v => spline.ControlPointsList[j] = v.AsType<StepCartesianPoint>());
             }
+            //spline.BindSyntaxList(binder, syntaxList, 2, 3);
 
             spline.CurveForm = ParseCurveForm(syntaxList.Values[3].GetEnumerationValue());
             spline.ClosedCurve = syntaxList.Values[4].GetBooleanValue();

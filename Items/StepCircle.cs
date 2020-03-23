@@ -55,9 +55,10 @@ namespace StepParser.Items
             yield return new StepRealSyntax(Radius);
         }
 
-        internal static StepCircle CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepCircle CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var circle = new StepCircle();
+            circle.Id = id;
             syntaxList.AssertListCount(3);
             circle.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => circle.Position = v.AsType<StepAxis2Placement>());

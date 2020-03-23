@@ -43,7 +43,9 @@ namespace StepParser.Items
         FillAreaStyle,
         FillAreaStyleColour,
         ColourRGB,
-        NextAssemblyUsageOccurrence
+        NextAssemblyUsageOccurrence,
+        FaceSurface, //Tien added on March 21 2020
+        Unknown //Tien added on March 21 2020
     }
     
     internal static class StepItemTypeExtensions
@@ -85,6 +87,7 @@ namespace StepParser.Items
         public const string FillAreaStyleColourText = "FILL_AREA_STYLE_COLOUR";
         public const string ColourRGBText = "COLOUR_RGB";
         public const string NextAssemblyUsageOccurrenceText = "NEXT_ASSEMBLY_USAGE_OCCURRENCE";
+        public const string FaceSurfaceText = "FACE_SURFACE"; //Tien added on Mar 21 2020
 
 
         public static string GetItemTypeString(this StepItemType type)

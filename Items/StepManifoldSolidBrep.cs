@@ -29,14 +29,13 @@ namespace StepParser.Items
             syntaxList.AssertListCount(2);
             manifoldSolidBrep.Id = id;
             manifoldSolidBrep.Name = syntaxList.Values[0].GetStringValue();
-            binder.BindValue(syntaxList.Values[1], v => manifoldSolidBrep.ClosedShell = v.AsType<StepClosedShell>());
-
+            manifoldSolidBrep.BindSyntaxList(binder, syntaxList, 1);
             return manifoldSolidBrep;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            ClosedShell.WriteXML(writer);
+            base.WriteXML(writer);
         }
     }
 }

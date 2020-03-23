@@ -58,9 +58,10 @@ namespace StepParser.Items
             yield return new StepRealSyntax(SemiAxis2);
         }
 
-        internal static StepEllipse CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepEllipse CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var ellipse = new StepEllipse();
+            ellipse.Id = id;
             syntaxList.AssertListCount(4);
             ellipse.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => ellipse.Position = v.AsType<StepAxis2Placement>());

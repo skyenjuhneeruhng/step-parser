@@ -10,7 +10,7 @@ namespace StepParser.Items
     {
         public override StepItemType ItemType => StepItemType.ShapeDefinitionRepresentation;
         public StepProductDefinitionShape DefinitionShape { get; set; }
-        public StepShapeRepresentation UsedRepresentation { get; set; }
+        public StepRepresentationItem UsedRepresentation { get; set; } //it maybe is StepShapeRepresentation or StepAdvancedBrepShapeRepresentation
         public StepShapeRepresentationRelationShip UsedRepresentationRelationShip { get; set; }
 
         private StepShapeDefinitionRepresentation()
@@ -37,8 +37,10 @@ namespace StepParser.Items
             shapeDefinitionRepresentation.Id = id;
 
             binder.BindValue(syntaxList.Values[0], v => shapeDefinitionRepresentation.DefinitionShape = v.AsType<StepProductDefinitionShape>());
-            binder.BindValue(syntaxList.Values[1], v => shapeDefinitionRepresentation.UsedRepresentation = v.AsType<StepShapeRepresentation>());
-
+            //var itemInstance = (StepEntityInstanceReferenceSyntax)syntaxList.Values[1];
+            //if(itemInstance)
+            //binder.BindValue(syntaxList.Values[1], v => shapeDefinitionRepresentation.UsedRepresentation = v.AsType<StepShapeRepresentation>());
+            binder.BindValue(syntaxList.Values[1], v => shapeDefinitionRepresentation.UsedRepresentation = v.Item);
             return shapeDefinitionRepresentation;
         }
 
@@ -55,6 +57,11 @@ namespace StepParser.Items
                     if (UsedRepresentationRelationShip != null)
                     {
                         UsedRepresentationRelationShip.WriteXML(writer);
+                    }
+                    else //some stp file does not contain UsedRepresentationRelationShip entity
+                    {
+                        if (UsedRepresentation != null)
+                            UsedRepresentation.WriteXML(writer);
                     }
 
                     writer.WriteEndElement();

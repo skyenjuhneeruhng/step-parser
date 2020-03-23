@@ -61,9 +61,10 @@ namespace StepParser.Items
             yield return StepWriter.GetBooleanSyntax(Orientation);
         }
 
-        internal static StepOrientedEdge CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepOrientedEdge CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var orientedEdge = new StepOrientedEdge();
+            orientedEdge.Id = id;
             syntaxList.AssertListCount(5);
             orientedEdge.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => orientedEdge.EdgeStart = v.AsType<StepVertex>());

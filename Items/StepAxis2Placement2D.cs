@@ -37,21 +37,23 @@ namespace StepParser.Items
             yield return writer.GetItemSyntax(RefDirection);
         }
 
-        internal static StepAxis2Placement2D CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepAxis2Placement2D CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var axis = new StepAxis2Placement2D();
+            axis.Id = id;
             syntaxList.AssertListCount(3);
             axis.Name = syntaxList.Values[0].GetStringValue();
-            binder.BindValue(syntaxList.Values[1], v => axis.Location = v.AsType<StepCartesianPoint>());
-            binder.BindValue(syntaxList.Values[2], v => axis.RefDirection = v.AsType<StepDirection>());
+            //binder.BindValue(syntaxList.Values[1], v => axis.Location = v.AsType<StepCartesianPoint>());
+            //binder.BindValue(syntaxList.Values[2], v => axis.RefDirection = v.AsType<StepDirection>());
+            axis.BindSyntaxList(binder, syntaxList, 1);
             return axis;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+            //writer.WriteStartElement(ItemType.GetItemTypeElementString());
             base.WriteXML(writer);
-            writer.WriteEndElement();
+            //writer.WriteEndElement();
         }
     }
 }

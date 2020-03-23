@@ -120,8 +120,11 @@ namespace StepParser
 
         public void SetRelationShip()
         {
-            for(int idx = 0; idx < _file.Items.Count; idx++)
+            List<StepStyledItem> stepStyleItems = GetStyledItems();
+            for (int idx = 0; idx < _file.Items.Count; idx++)
             {
+                StepRepresentationItem item = _file.Items[idx];
+                UpdateBindStyleItems(item, stepStyleItems);
                 if (_file.Items[idx].ItemType == StepItemType.ShapeDefinitionRepresentation)
                 {
                     var relationShip = GetShapeRelationShip((StepShapeDefinitionRepresentation)_file.Items[idx]);
@@ -130,11 +133,6 @@ namespace StepParser
                         ((StepShapeDefinitionRepresentation)_file.Items[idx]).SetShapePresentationRelationShip(relationShip);
                     }
                     
-                }
-                else if (_file.Items[idx].ItemType == StepItemType.AdvancedBrepShapeRepresentation)
-                {
-                    List<StepStyledItem> styledItems = GetStyledItems((StepAdvancedBrepShapeRepresentation)_file.Items[idx]);
-                    ((StepAdvancedBrepShapeRepresentation)_file.Items[idx]).SetStyledItems(styledItems);
                 }
                 else if (_file.Items[idx].ItemType == StepItemType.ProductDefinition)
                 {
@@ -161,24 +159,51 @@ namespace StepParser
             return null;
         }
 
-        public List<StepStyledItem> GetStyledItems(StepAdvancedBrepShapeRepresentation item)
+        public void UpdateBindStyleItems(StepRepresentationItem item, List<StepStyledItem> stepStyleItems)
         {
-            var styledItems = new List<StepStyledItem>();
-            if (item.UsedSolidBrepList != null && item.UsedSolidBrepList.Count > 0)
+            List<StepStyledItem> bindStyleItems = new List<StepStyledItem>();
+            foreach (var obj in item.RefObjs)
             {
-                foreach(var solidBrep in item.UsedSolidBrepList)
+                if (obj.Value != null && obj.Value.Count > 0)
                 {
-                    foreach (var eachItem in _file.Items)
+                    foreach (var stepItem in stepStyleItems)
                     {
-                        if (eachItem.ItemType == StepItemType.StyledItem)
+                        foreach (var objStepItem in stepItem.RefObjs)
                         {
-                            var itemInstance = (StepStyledItem)eachItem;
-                            if (itemInstance.UsedSolidBrep != null && itemInstance.UsedSolidBrep.Id == solidBrep.Id)
+                            if (objStepItem.Value != null && objStepItem.Value.Count > 0)
                             {
-                                styledItems.Add(itemInstance);
+                                foreach (var iStepItem in objStepItem.Value)
+                                {
+                                    if (obj.Value.Find(x => ((StepRepresentationItem)x).Id == ((StepRepresentationItem)iStepItem).Id) != null)
+                                    {
+                                        bindStyleItems.Add(stepItem);
+                                    }
+                                }
                             }
                         }
+
                     }
+
+                }
+            }
+            if (bindStyleItems.Count > 0)
+            {
+                foreach (var stepItem in bindStyleItems)
+                {
+                    item.AddRefObjs(stepItem);
+                }
+            }
+        }
+
+        public List<StepStyledItem> GetStyledItems()
+        {
+            var styledItems = new List<StepStyledItem>();
+            foreach (var eachItem in _file.Items)
+            {
+                if (eachItem.ItemType == StepItemType.StyledItem)
+                {
+                    var itemInstance = (StepStyledItem)eachItem;
+                    styledItems.Add(itemInstance);
                 }
             }
 
@@ -247,11 +272,6 @@ namespace StepParser
             }
 
             return parts;
-        }
-
-        private string toCamel(string input)
-        {
-            return new CultureInfo("en").TextInfo.ToTitleCase(input.ToLower().Replace("_", " ")).Replace(" ", "");
         }
     }
 }

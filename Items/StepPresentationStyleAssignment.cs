@@ -10,7 +10,7 @@ namespace StepParser.Items
     public class StepPresentationStyleAssignment: StepRepresentationItem
     {
         public override StepItemType ItemType => StepItemType.PresentationStyleAssignment;
-        public List<StepSurfaceStyleUsage> StyleUsageList { get; set; } = new List<StepSurfaceStyleUsage>();
+        //public List<StepSurfaceStyleUsage> StyleUsageList { get; set; } = new List<StepSurfaceStyleUsage>();
 
         private StepPresentationStyleAssignment()
             : base(string.Empty, 0)
@@ -29,16 +29,7 @@ namespace StepParser.Items
             var presentationStyleAssignment = new StepPresentationStyleAssignment();
             syntaxList.AssertListCount(1);
             presentationStyleAssignment.Id = id;
-
-            var referList = syntaxList.Values[0].GetValueList();
-            presentationStyleAssignment.StyleUsageList.Clear();
-            presentationStyleAssignment.StyleUsageList.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepSurfaceStyleUsage)null));
-            for (int i = 0; i < referList.Values.Count; i++)
-            {
-                var j = i;
-                binder.BindValue(referList.Values[j], v => presentationStyleAssignment.StyleUsageList[j] = v.AsType<StepSurfaceStyleUsage>());
-            }
-
+            presentationStyleAssignment.BindSyntaxList(binder, syntaxList, 0);
             return presentationStyleAssignment;
         }
 
@@ -46,10 +37,7 @@ namespace StepParser.Items
         {
             writer.WriteStartElement("StyleAssignment");
             writer.WriteAttributeString("id", "#" + Id.ToString());
-            foreach (var styleUsage in StyleUsageList)
-            {
-                styleUsage.WriteXML(writer);
-            }
+            base.WriteXML(writer);
             writer.WriteEndElement();
         }
     }

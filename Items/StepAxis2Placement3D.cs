@@ -59,27 +59,29 @@ namespace StepParser.Items
             yield return writer.GetItemSyntax(RefDirection);
         }
 
-        internal static StepAxis2Placement3D CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepAxis2Placement3D CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var axis = new StepAxis2Placement3D();
             syntaxList.AssertListCount(4);
+            axis.Id = id;
             axis.Name = syntaxList.Values[0].GetStringValue();
-            binder.BindValue(syntaxList.Values[1], v => axis.Location = v.AsType<StepCartesianPoint>());
-            binder.BindValue(syntaxList.Values[2], v => axis.Axis = v.AsType<StepDirection>());
-            binder.BindValue(syntaxList.Values[3], v => axis.RefDirection = v.AsType<StepDirection>());
+            //binder.BindValue(syntaxList.Values[1], v => axis.Location = v.AsType<StepCartesianPoint>());
+            //binder.BindValue(syntaxList.Values[2], v => axis.Axis = v.AsType<StepDirection>());
+            //binder.BindValue(syntaxList.Values[3], v => axis.RefDirection = v.AsType<StepDirection>());
+            axis.BindSyntaxList(binder, syntaxList);
             return axis;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+            //writer.WriteStartElement(ItemType.GetItemTypeElementString());
 
             base.WriteXML(writer);
-            writer.WriteStartElement("Axis");
-            Axis.WriteXML(writer);
-            writer.WriteEndElement();
+           // writer.WriteStartElement("Axis");
+            //Axis.WriteXML(writer);
+            //writer.WriteEndElement();
 
-            writer.WriteEndElement();
+            //writer.WriteEndElement();
         }
     }
 }

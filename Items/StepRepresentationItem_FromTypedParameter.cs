@@ -50,49 +50,49 @@ namespace StepParser.Items
                         item = StepAdvancedFace.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.Axis2Placement2DText:
-                        item = StepAxis2Placement2D.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepAxis2Placement2D.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.Axis2Placement3DText:
-                        item = StepAxis2Placement3D.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepAxis2Placement3D.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.BSplineCurveWithKnotsText:
-                        item = StepBSplineCurveWithKnots.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepBSplineCurveWithKnots.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.CartesianPointText:
-                        item = StepCartesianPoint.CreateFromSyntaxList(simpleItem.Parameters);
+                        item = StepCartesianPoint.CreateFromSyntaxList(simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.CircleText:
-                        item = StepCircle.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepCircle.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.CylindricalSurfaceText:
                         item = StepCylindricalSurface.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.DirectionText:
-                        item = StepDirection.CreateFromSyntaxList(simpleItem.Parameters);
+                        item = StepDirection.CreateFromSyntaxList(simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.EdgeCurveText:
-                        item = StepEdgeCurve.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepEdgeCurve.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.EdgeLoopText:
-                        item = StepEdgeLoop.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepEdgeLoop.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.EllipseText:
-                        item = StepEllipse.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepEllipse.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.FaceBoundText:
-                        item = StepFaceBound.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepFaceBound.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.FaceOuterBoundText:
-                        item = StepFaceOuterBound.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepFaceOuterBound.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.LineText:
-                        item = StepLine.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepLine.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.OrientedEdgeText:
-                        item = StepOrientedEdge.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepOrientedEdge.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.PlaneText:
-                        item = StepPlane.CreateFromSyntaxList(binder, simpleItem.Parameters);
+                        item = StepPlane.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
                     case StepItemTypeExtensions.VectorText:
                         item = StepVector.CreateFromSyntaxList(binder, simpleItem.Parameters);
@@ -127,10 +127,14 @@ namespace StepParser.Items
                     case StepItemTypeExtensions.NextAssemblyUsageOccurrenceText:
                         item = StepNextAssemblyUsageOccrrence.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
                         break;
+                    case StepItemTypeExtensions.FaceSurfaceText: //Tien added on Mar 21 2020
+                        item = StepFaceSurface.CreateFromSyntaxList(binder, simpleItem.Parameters, id);
+                        break;
                     default:
+                        item = StepDynamicItem.CreateFromSyntaxList(binder, simpleItem, id); //Tien added on Mar 21 2020
                         if (UnsupportedItemTypes.Add(simpleItem.Keyword))
                         {
-                            Debug.WriteLine($"Unsupported item {simpleItem.Keyword} at {simpleItem.Line}, {simpleItem.Column}");
+                            //Debug.WriteLine($"Unsupported item {simpleItem.Keyword} at {simpleItem.Line}, {simpleItem.Column}");
                         }
                         break;
                 }

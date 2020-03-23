@@ -1,4 +1,6 @@
 ﻿
+using System.Collections.Generic;
+
 namespace StepParser.Items
 {
     public abstract class StepPlacement : StepGeometricRepresentationItem

@@ -18,22 +18,23 @@ namespace StepParser.Items
 
         public override StepItemType ItemType => StepItemType.AdvancedFace;
 
-        internal static StepAdvancedFace CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
+        internal static new StepAdvancedFace CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var face = new StepAdvancedFace();
             syntaxList.AssertListCount(4);
             face.Id = id;
             face.Name = syntaxList.Values[0].GetStringValue();
 
-            var boundsList = syntaxList.Values[1].GetValueList();
-            face.Bounds.Clear();
-            face.Bounds.AddRange(Enumerable.Range(0, boundsList.Values.Count).Select(_ => (StepFaceBound)null));
-            for (int i = 0; i < boundsList.Values.Count; i++)
-            {
-                var j = i; // capture to avoid rebinding
-                binder.BindValue(boundsList.Values[j], v => face.Bounds[j] = v.AsType<StepFaceBound>());
-            }
-            binder.BindValue(syntaxList.Values[2], v => face.FaceGeometry = v.AsType<StepSurface>());
+            //var boundsList = syntaxList.Values[1].GetValueList();
+            //face.Bounds.Clear();
+            //face.Bounds.AddRange(Enumerable.Range(0, boundsList.Values.Count).Select(_ => (StepFaceBound)null));
+            //for (int i = 0; i < boundsList.Values.Count; i++)
+            //{
+            //    var j = i; // capture to avoid rebinding
+            //    binder.BindValue(boundsList.Values[j], v => face.Bounds[j] = v.AsType<StepFaceBound>());
+            //}
+            //binder.BindValue(syntaxList.Values[2], v => face.FaceGeometry = v.AsType<StepSurface>());
+            face.BindSyntaxList(binder, syntaxList, 1, 3);
             face.SameSense = syntaxList.Values[3].GetBooleanValue();
 
             return face;
@@ -42,11 +43,7 @@ namespace StepParser.Items
         internal override void WriteXML(XmlWriter writer)
         {
             writer.WriteStartElement(ItemType.GetItemTypeElementString());
-            writer.WriteAttributeString("id", '#' + Id.ToString());            
-            for (int idx = 0; idx < Bounds.Count; idx++)
-            {
-                Bounds[idx].WriteXML(writer);
-            }
+            writer.WriteAttributeString("id", '#' + Id.ToString());
             base.WriteXML(writer);
             writer.WriteEndElement();
         }

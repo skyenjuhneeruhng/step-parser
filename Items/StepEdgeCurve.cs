@@ -62,9 +62,10 @@ namespace StepParser.Items
             yield return StepWriter.GetBooleanSyntax(IsSameSense);
         }
 
-        internal static StepEdgeCurve CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepEdgeCurve CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var edgeCurve = new StepEdgeCurve();
+            edgeCurve.Id = id;
             syntaxList.AssertListCount(5);
             edgeCurve.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => edgeCurve.EdgeStart = v.AsType<StepVertex>());

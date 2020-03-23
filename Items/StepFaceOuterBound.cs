@@ -1,4 +1,5 @@
 ﻿using StepParser.Syntax;
+using System.Xml;
 
 namespace StepParser.Items
 {
@@ -11,19 +12,15 @@ namespace StepParser.Items
         {
         }
 
-        public StepFaceOuterBound(string name, StepLoop bound, bool orientation)
-            : base(name, bound, orientation)
-        {
-        }
-
-        internal static new StepFaceOuterBound CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static new StepFaceOuterBound CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             syntaxList.AssertListCount(3);
             var faceOuterBound = new StepFaceOuterBound();
+            faceOuterBound.Id = id;
             faceOuterBound.Name = syntaxList.Values[0].GetStringValue();
-            binder.BindValue(syntaxList.Values[1], v => faceOuterBound.Bound = v.AsType<StepLoop>());
+            faceOuterBound.BindSyntaxList(binder, syntaxList, 1);
             faceOuterBound.Orientation = syntaxList.Values[2].GetBooleanValue();
             return faceOuterBound;
-        }
+        }  
     }
 }

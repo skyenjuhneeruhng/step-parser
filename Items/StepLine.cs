@@ -85,9 +85,10 @@ namespace StepParser.Items
             yield return writer.GetItemSyntax(Vector);
         }
 
-        internal static StepLine CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
+        internal static StepLine CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var line = new StepLine();
+            line.Id = id;
             syntaxList.AssertListCount(3);
             line.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => line.Point = v.AsType<StepCartesianPoint>());

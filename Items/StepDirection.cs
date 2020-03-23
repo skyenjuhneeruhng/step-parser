@@ -17,9 +17,11 @@ namespace StepParser.Items
         {
         }
 
-        internal static StepDirection CreateFromSyntaxList(StepSyntaxList syntaxList)
+        internal static StepDirection CreateFromSyntaxList(StepSyntaxList syntaxList, int id)
         {
-            return (StepDirection)AssignTo(new StepDirection(), syntaxList);
+            var item = new StepDirection();
+            item.Id = id;
+            return (StepDirection)AssignTo(item, syntaxList);
         }
 
         internal override void WriteXML(XmlWriter writer)

@@ -1,6 +1,7 @@
 ﻿using StepParser.Syntax;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml;
@@ -11,7 +12,35 @@ namespace StepParser.Items
     {
         public override StepItemType ItemType => StepItemType.StyledItem;
         public List<StepPresentationStyleAssignment> StyleAssignments { get; set; } = new List<StepPresentationStyleAssignment>();
-        public StepManifoldSolidBrep UsedSolidBrep { get; set; }
+
+        public StepManifoldSolidBrep _usedSolidBrep = null;
+        public StepManifoldSolidBrep UsedSolidBrep {
+            get
+            {
+                if(_usedSolidBrep == null)
+                {
+                    foreach (var obj in RefObjs)
+                    {
+                        if(obj.Value != null)
+                        {
+                            foreach (var item in obj.Value)
+                            {
+                                if (item is StepManifoldSolidBrep)
+                                {
+                                    _usedSolidBrep = (StepManifoldSolidBrep)item;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                return _usedSolidBrep;
+            }
+            set
+            {
+                _usedSolidBrep = value;
+            }
+        }
 
         private StepStyledItem()
             : base(string.Empty, 0)
@@ -32,28 +61,39 @@ namespace StepParser.Items
             styledItem.Id = id;
             styledItem.Name = syntaxList.Values[0].GetStringValue();
 
-            var referList = syntaxList.Values[1].GetValueList();
-            styledItem.StyleAssignments.Clear();
-            styledItem.StyleAssignments.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepPresentationStyleAssignment)null));
-            for (int i = 0; i < referList.Values.Count; i++)
-            {
-                var j = i; // capture to avoid rebinding
-                binder.BindValue(referList.Values[j], v => styledItem.StyleAssignments[j] = v.AsType<StepPresentationStyleAssignment>());
-            }
-
-            binder.BindValue(syntaxList.Values[2], v => styledItem.UsedSolidBrep = v.AsType<StepManifoldSolidBrep>());
-
+            styledItem.BindSyntaxList(binder, syntaxList, 1);
             return styledItem;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            writer.WriteStartElement("StyleAssignments");
-            foreach (var styleAssignment in StyleAssignments)
+            foreach (var obj in RefObjs)
             {
-                styleAssignment.WriteXML(writer);
+                if (obj.Value != null && obj.Value.Count > 0)
+                {
+                    if(obj.Key == StepItemType.PresentationStyleAssignment.ToString())
+                    {
+                        if (obj.Value.Count > 1)
+                            writer.WriteStartElement(obj.Key.ToString() + "s");
+                        foreach (var item in obj.Value)
+                        {
+                            if (item != null)
+                            {
+                                if (item is StepRepresentationItem)
+                                {
+                                    ((StepRepresentationItem)item).WriteXML(writer);
+                                }
+                                else
+                                {
+                                    Debug.WriteLine($"Unsupported writexlm for item {item.ToString()}");
+                                }
+                            }
+                        }
+                        if (obj.Value.Count > 1)
+                            writer.WriteEndElement();
+                    }
+                }
             }
-            writer.WriteEndElement();
         }
     }
 }

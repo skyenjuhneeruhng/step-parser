@@ -17,9 +17,11 @@ namespace StepParser.Items
         {
         }
 
-        internal static StepCartesianPoint CreateFromSyntaxList(StepSyntaxList syntaxList)
+        internal static StepCartesianPoint CreateFromSyntaxList(StepSyntaxList syntaxList, int id)
         {
-            return (StepCartesianPoint)AssignTo(new StepCartesianPoint(), syntaxList);
+            var item = new StepCartesianPoint();
+            item.Id = id;
+            return (StepCartesianPoint)AssignTo(item, syntaxList);
         }
 
         internal override void WriteXML(XmlWriter writer)

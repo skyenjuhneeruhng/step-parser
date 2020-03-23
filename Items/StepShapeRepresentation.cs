@@ -10,9 +10,9 @@ namespace StepParser.Items
     public class StepShapeRepresentation: StepRepresentationItem
     {
         public override StepItemType ItemType => StepItemType.ShapeRepresentation;
-        public List<StepRepresentationItem> UsedRepresentationItems { get; set; } = new List<StepRepresentationItem>();
+        //public List<StepRepresentationItem> UsedRepresentationItems { get; set; } = new List<StepRepresentationItem>();
 
-        private StepShapeRepresentation()
+        protected StepShapeRepresentation()
             : base(string.Empty, 0)
         {
         }
@@ -30,20 +30,13 @@ namespace StepParser.Items
             syntaxList.AssertListCount(3);
             shapeRepresentation.Id = id;
             shapeRepresentation.Name = syntaxList.Values[0].GetStringValue();
-            var referList = syntaxList.Values[1].GetValueList();
-            shapeRepresentation.UsedRepresentationItems.Clear();
-            shapeRepresentation.UsedRepresentationItems.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepRepresentationItem)null));
-            for (int i = 0; i < referList.Values.Count; i++)
-            {
-                var j = i;
-                binder.BindValue(referList.Values[j], v => shapeRepresentation.UsedRepresentationItems[j] = v.AsType<StepRepresentationItem>());
-            }
-
+            shapeRepresentation.BindSyntaxList(binder, syntaxList, 1);
             return shapeRepresentation;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
+            base.WriteXML(writer); //Tien added on Mar 21 2020
         }
     }
 }

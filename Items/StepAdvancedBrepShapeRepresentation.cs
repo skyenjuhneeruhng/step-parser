@@ -10,17 +10,10 @@ namespace StepParser.Items
     public class StepAdvancedBrepShapeRepresentation: StepRepresentationItem
     {
         public override StepItemType ItemType => StepItemType.AdvancedBrepShapeRepresentation;
-        public List<StepManifoldSolidBrep> UsedSolidBrepList { get; set; } = new List<StepManifoldSolidBrep>();
-        public List<StepStyledItem> UsedStyledItems { get; set; }  = new List<StepStyledItem>();
 
         private StepAdvancedBrepShapeRepresentation()
             : base(string.Empty, 0)
         {
-        }
-
-        public void SetStyledItems(List<StepStyledItem> _styledItems)
-        {
-            UsedStyledItems = _styledItems;
         }
 
         internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
@@ -36,30 +29,14 @@ namespace StepParser.Items
             syntaxList.AssertListCount(3);
             advancedBrepShapeRepresentation.Id = id;
             advancedBrepShapeRepresentation.Name = syntaxList.Values[0].GetStringValue();
-
-            var referList = syntaxList.Values[1].GetValueList();
-            advancedBrepShapeRepresentation.UsedSolidBrepList.Clear();
-            advancedBrepShapeRepresentation.UsedSolidBrepList.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepManifoldSolidBrep)null));
-            for (int i = 0; i < referList.Values.Count; i++)
-            {
-                var j = i;
-                binder.BindValue(referList.Values[j], v => advancedBrepShapeRepresentation.UsedSolidBrepList[j] = v.AsType<StepManifoldSolidBrep>());
-            }
+            advancedBrepShapeRepresentation.BindSyntaxList(binder, syntaxList, 1);
 
             return advancedBrepShapeRepresentation;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            foreach(var solidBrep in UsedSolidBrepList)
-            {
-                solidBrep.WriteXML(writer);
-            }
-            
-            foreach (var styledItem in UsedStyledItems)
-            {
-                styledItem.WriteXML(writer);
-            }
+            base.WriteXML(writer);
         }
     }
 }

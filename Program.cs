@@ -16,7 +16,7 @@ namespace StepParser
                     string fullPath = Path.GetFullPath(args[0]);
                     string onlyPath = Directory.GetParent(fullPath).FullName;
                     string fileName = Path.GetFileNameWithoutExtension(args[0]);
-                    Console.WriteLine("Loading STP file...");
+                    Console.WriteLine("Loading STP file... " + fileName);
                     StepFile stepFile;
                     using (FileStream fs = new FileStream(fullPath, FileMode.Open))
                     {

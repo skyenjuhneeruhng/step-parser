@@ -10,7 +10,7 @@ namespace StepParser.Items
     {
         public override StepItemType ItemType => StepItemType.ShapeRepresentationRelationship;
         public StepShapeRepresentation UsedRepresentation { get; set; }
-        public StepAdvancedBrepShapeRepresentation AdvancedBrepShapeRepresentation { get; set; }
+        //public StepAdvancedBrepShapeRepresentation AdvancedBrepShapeRepresentation { get; set; }
 
         private StepShapeRepresentationRelationShip()
             : base(string.Empty, 0)
@@ -33,14 +33,13 @@ namespace StepParser.Items
             shapeRepresentationRelationShip.Description = syntaxList.Values[1].GetStringValue();
 
             binder.BindValue(syntaxList.Values[2], v => shapeRepresentationRelationShip.UsedRepresentation = v.AsType<StepShapeRepresentation>());
-            binder.BindValue(syntaxList.Values[3], v => shapeRepresentationRelationShip.AdvancedBrepShapeRepresentation = v.AsType<StepAdvancedBrepShapeRepresentation>());
-
+            shapeRepresentationRelationShip.BindSyntaxList(binder, syntaxList, 3);
             return shapeRepresentationRelationShip;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            AdvancedBrepShapeRepresentation.WriteXML(writer);
+            base.WriteXML(writer);
         }
     }
 }

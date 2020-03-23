@@ -29,14 +29,16 @@ namespace StepParser.Items
             syntaxList.AssertListCount(1);
             surfaceStyleFillArea.Id = id;
 
-            binder.BindValue(syntaxList.Values[0], v => surfaceStyleFillArea.FillAreaStyle = v.AsType<StepFillAreaStyle>());
-
+            //binder.BindValue(syntaxList.Values[0], v => surfaceStyleFillArea.FillAreaStyle = v.AsType<StepFillAreaStyle>());
+            surfaceStyleFillArea.BindSyntaxList(binder, syntaxList, 0);
             return surfaceStyleFillArea;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            FillAreaStyle.WriteXML(writer);
+            writer.WriteStartElement("SurfaceStyleFillArea");
+            base.WriteXML(writer);
+            writer.WriteEndElement();
         }
     }
 }

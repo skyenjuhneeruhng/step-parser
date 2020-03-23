@@ -30,6 +30,7 @@ namespace StepParser.Items
 
         internal override void WriteXML(XmlWriter writer)
         {
+            base.WriteXML(writer);
         }
     }
 }

@@ -43,13 +43,14 @@ namespace StepParser.Items
 
         internal override void WriteXML(XmlWriter writer)
         {
-            writer.WriteStartElement("Location");
-            _location.WriteXML(writer);
-            writer.WriteEndElement();
+            //writer.WriteStartElement("Location");
+            //_location.WriteXML(writer);
+            //writer.WriteEndElement();
 
-            writer.WriteStartElement("RefDirection");
-            _refDirection.WriteXML(writer);
-            writer.WriteEndElement();
+            //writer.WriteStartElement("RefDirection");
+            //_refDirection.WriteXML(writer);
+            //writer.WriteEndElement();
+            base.WriteXML(writer);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace StepParser.Items
     public class StepFillAreaStyleColour: StepRepresentationItem
     {
         public override StepItemType ItemType => StepItemType.FillAreaStyleColour;
-        public StepColourRGB Colour { get; set; }
+        //public StepColourRGB Colour { get; set; }
 
         private StepFillAreaStyleColour()
             : base(string.Empty, 0)
@@ -30,15 +30,15 @@ namespace StepParser.Items
             fillAreaStyleColor.Id = id;
             fillAreaStyleColor.Name = syntaxList.Values[0].GetStringValue();
 
-            binder.BindValue(syntaxList.Values[1], v => fillAreaStyleColor.Colour = v.AsType<StepColourRGB>());
-
+            //binder.BindValue(syntaxList.Values[1], v => fillAreaStyleColor.Colour = v.AsType<StepColourRGB>());
+            fillAreaStyleColor.BindSyntaxList(binder, syntaxList, 1);
             return fillAreaStyleColor;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
             writer.WriteStartElement("FillStyle");
-            Colour.WriteXML(writer);
+            base.WriteXML(writer);
             writer.WriteEndElement();
         }
     }

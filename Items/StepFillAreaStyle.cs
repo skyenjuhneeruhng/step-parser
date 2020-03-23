@@ -11,7 +11,7 @@ namespace StepParser.Items
     {
         public override StepItemType ItemType => StepItemType.FillAreaStyle;
         public string Description { get; set; }
-        public List<StepFillAreaStyleColour> FillAreaStyleColours { get; set; } = new List<StepFillAreaStyleColour>();
+        //public List<StepFillAreaStyleColour> FillAreaStyleColours { get; set; } = new List<StepFillAreaStyleColour>();
 
         private StepFillAreaStyle()
             : base(string.Empty, 0)
@@ -32,15 +32,15 @@ namespace StepParser.Items
             fillAreaStyle.Id = id;
             fillAreaStyle.Name = syntaxList.Values[0].GetStringValue();
 
-            var referList = syntaxList.Values[1].GetValueList();
-            fillAreaStyle.FillAreaStyleColours.Clear();
-            fillAreaStyle.FillAreaStyleColours.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepFillAreaStyleColour)null));
-            for (int i = 0; i < referList.Values.Count; i++)
-            {
-                var j = i;
-                binder.BindValue(referList.Values[j], v => fillAreaStyle.FillAreaStyleColours[j] = v.AsType<StepFillAreaStyleColour>());
-            }
-
+            //var referList = syntaxList.Values[1].GetValueList();
+            //fillAreaStyle.FillAreaStyleColours.Clear();
+            //fillAreaStyle.FillAreaStyleColours.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepFillAreaStyleColour)null));
+            //for (int i = 0; i < referList.Values.Count; i++)
+            //{
+            //    var j = i;
+            //    binder.BindValue(referList.Values[j], v => fillAreaStyle.FillAreaStyleColours[j] = v.AsType<StepFillAreaStyleColour>());
+            //}
+            fillAreaStyle.BindSyntaxList(binder, syntaxList, 1);
             return fillAreaStyle;
         }
 
@@ -48,10 +48,11 @@ namespace StepParser.Items
         {
             writer.WriteStartElement("Element");
             writer.WriteAttributeString("type", "FILL_AREA");
-            foreach (var fillAreaStyleColour in FillAreaStyleColours)
-            {
-                fillAreaStyleColour.WriteXML(writer);
-            }
+            //foreach (var fillAreaStyleColour in FillAreaStyleColours)
+            //{
+            //    fillAreaStyleColour.WriteXML(writer);
+            //}
+            base.WriteXML(writer);
             writer.WriteEndElement();
         }
     }
