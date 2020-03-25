@@ -9,36 +9,30 @@ namespace StepParser.Items
     public class StepProductDefinitionShape: StepComponentAssemble
     {
         public override StepItemType ItemType => StepItemType.ProductDefinitionShape;
-        public StepComponentAssemble Definition { get; set; }
-
         private StepProductDefinitionShape()
             : base(string.Empty, 0)
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepProductDefinitionShape CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var productDefinitionShape = new StepProductDefinitionShape();
+            productDefinitionShape.SyntaxList = syntaxList;
             syntaxList.AssertListCount(3);
             productDefinitionShape.Id = id;
             productDefinitionShape.Name = syntaxList.Values[0].GetStringValue();
             productDefinitionShape.Description = syntaxList.Values[1].GetStringValue();
 
-            binder.BindValue(syntaxList.Values[2], v => productDefinitionShape.Definition = v.AsType<StepComponentAssemble>());
+            productDefinitionShape.BindSyntaxList(binder, syntaxList, 2);
 
             return productDefinitionShape;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            Definition.WriteXML(writer);
+            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+            base.WriteXML(writer);
+            writer.WriteEndElement();
         }
     }
 }

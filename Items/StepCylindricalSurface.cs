@@ -21,20 +21,11 @@ namespace StepParser.Items
             Radius = radius;
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return new StepRealSyntax(Radius);
-        }
-
         internal static StepRepresentationItem CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             syntaxList.AssertListCount(3);
             var surface = new StepCylindricalSurface();
+            surface.SyntaxList = syntaxList;
             surface.Id = id;
             surface.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => surface.Position = v.AsType<StepAxis2Placement3D>());

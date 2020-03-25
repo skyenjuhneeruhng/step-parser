@@ -18,16 +18,10 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepColourRGB CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var colourRGB = new StepColourRGB();
+            colourRGB.SyntaxList = syntaxList;
             syntaxList.AssertListCount(4);
             colourRGB.Id = id;
             colourRGB.Name = syntaxList.Values[0].GetStringValue();

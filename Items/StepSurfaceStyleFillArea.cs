@@ -16,20 +16,13 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepSurfaceStyleFillArea CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var surfaceStyleFillArea = new StepSurfaceStyleFillArea();
+            surfaceStyleFillArea.SyntaxList = syntaxList;
             syntaxList.AssertListCount(1);
             surfaceStyleFillArea.Id = id;
 
-            //binder.BindValue(syntaxList.Values[0], v => surfaceStyleFillArea.FillAreaStyle = v.AsType<StepFillAreaStyle>());
             surfaceStyleFillArea.BindSyntaxList(binder, syntaxList, 0);
             return surfaceStyleFillArea;
         }

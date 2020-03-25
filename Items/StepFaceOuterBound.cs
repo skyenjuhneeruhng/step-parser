@@ -16,6 +16,7 @@ namespace StepParser.Items
         {
             syntaxList.AssertListCount(3);
             var faceOuterBound = new StepFaceOuterBound();
+            faceOuterBound.SyntaxList = syntaxList;
             faceOuterBound.Id = id;
             faceOuterBound.Name = syntaxList.Values[0].GetStringValue();
             faceOuterBound.BindSyntaxList(binder, syntaxList, 1);

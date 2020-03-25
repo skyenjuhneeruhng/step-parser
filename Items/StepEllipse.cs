@@ -9,21 +9,6 @@ namespace StepParser.Items
     {
         public override StepItemType ItemType => StepItemType.Ellipse;
 
-        private StepAxis2Placement _position;
-
-        public StepAxis2Placement Position
-        {
-            get { return _position; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException();
-                }
-
-                _position = value;
-            }
-        }
 
         public double SemiAxis1 { get; set; }
         public double SemiAxis2 { get; set; }
@@ -33,38 +18,14 @@ namespace StepParser.Items
         {
         }
 
-        public StepEllipse(string name, StepAxis2Placement position, double semiAxis1, double semiAxis2)
-            : base(name)
-        {
-            Position = position;
-            SemiAxis1 = semiAxis1;
-            SemiAxis2 = semiAxis2;
-        }
-
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            yield return Position;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(Position);
-            yield return new StepRealSyntax(SemiAxis1);
-            yield return new StepRealSyntax(SemiAxis2);
-        }
-
         internal static StepEllipse CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var ellipse = new StepEllipse();
+            ellipse.SyntaxList = syntaxList;
             ellipse.Id = id;
             syntaxList.AssertListCount(4);
             ellipse.Name = syntaxList.Values[0].GetStringValue();
-            binder.BindValue(syntaxList.Values[1], v => ellipse.Position = v.AsType<StepAxis2Placement>());
+            ellipse.BindSyntaxList(binder, syntaxList, 1, 2);
             ellipse.SemiAxis1 = syntaxList.Values[2].GetRealVavlue();
             ellipse.SemiAxis2 = syntaxList.Values[3].GetRealVavlue();
             return ellipse;
@@ -72,13 +33,13 @@ namespace StepParser.Items
 
         internal override void WriteXML(XmlWriter writer)
         {
+            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+
             writer.WriteStartElement("Type");
             writer.WriteString(ItemType.GetItemTypeElementString());
             writer.WriteEndElement();
 
-            writer.WriteStartElement("Position");
-            _position.WriteXML(writer);
-            writer.WriteEndElement();
+            base.WriteXML(writer);
 
             writer.WriteStartElement("MajorAxis");
             writer.WriteString(SemiAxis1.ToString());
@@ -88,6 +49,7 @@ namespace StepParser.Items
             writer.WriteString(SemiAxis2.ToString());
             writer.WriteEndElement();
 
+            writer.WriteEndElement();
         }
     }
 }

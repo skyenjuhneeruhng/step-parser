@@ -9,23 +9,16 @@ namespace StepParser.Items
     public class StepManifoldSolidBrep: StepRepresentationItem
     {
         public override StepItemType ItemType => StepItemType.ManiFoldSolidBrep;
-        public StepClosedShell ClosedShell { get; set; }
 
         private StepManifoldSolidBrep()
             : base(string.Empty, 0)
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepManifoldSolidBrep CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var manifoldSolidBrep = new StepManifoldSolidBrep();
+            manifoldSolidBrep.SyntaxList = syntaxList;
             syntaxList.AssertListCount(2);
             manifoldSolidBrep.Id = id;
             manifoldSolidBrep.Name = syntaxList.Values[0].GetStringValue();

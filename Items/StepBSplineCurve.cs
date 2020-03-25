@@ -38,25 +38,6 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            return ControlPointsList;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return new StepIntegerSyntax(Degree);
-            yield return new StepSyntaxList(ControlPointsList.Select(c => writer.GetItemSyntax(c)));
-            yield return new StepEnumerationValueSyntax(GetCurveFormString(CurveForm));
-            yield return StepWriter.GetBooleanSyntax(ClosedCurve);
-            yield return StepWriter.GetBooleanSyntax(SelfIntersect);
-        }
-
         private const string POLYLINE_FORM = "POLYLINE_FORM";
         private const string CIRCULAR_ARC = "CIRCULAR_ARC";
         private const string ELLIPTIC_ARC = "ELLIPTIC_ARC";
@@ -106,6 +87,8 @@ namespace StepParser.Items
 
         internal override void WriteXML(XmlWriter writer)
         {
+            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+
             writer.WriteStartElement("Type");
             writer.WriteString(ItemType.GetItemTypeElementString());
             writer.WriteEndElement();
@@ -115,6 +98,9 @@ namespace StepParser.Items
             writer.WriteEndElement();
 
             writer.WriteStartElement("ControlPointsList");
+            base.WriteXML(writer);
+            writer.WriteEndElement();
+
             writer.WriteEndElement();
 
             //_vector.WriteXML(writer);

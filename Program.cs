@@ -1,4 +1,6 @@
-﻿using System;
+﻿using StepParser.ViewModel;
+using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -7,52 +9,110 @@ namespace StepParser
 {
     class Program
     {
+        private static List<string> _failedFiles = new List<string>();
         static void Main(string[] args)
         {
-            if (args.Length > 0)
+            try
             {
-                if (File.Exists(args[0]))
+                if (args.Length > 0)
                 {
-                    string fullPath = Path.GetFullPath(args[0]);
-                    string onlyPath = Directory.GetParent(fullPath).FullName;
-                    string fileName = Path.GetFileNameWithoutExtension(args[0]);
-                    Console.WriteLine("Loading STP file... " + fileName);
-                    StepFile stepFile;
-                    using (FileStream fs = new FileStream(fullPath, FileMode.Open))
+                    LogWriter.Instance.WriteInfoLog("Begin parser " + Properties.Resource.BuildDate);
+                    Console.WriteLine("Begin parser " + Properties.Resource.BuildDate);
+                    int countSuccess = 0;
+                    if (Directory.Exists(args[0]))
                     {
-                        stepFile = StepFile.Load(fs);
+                        Console.WriteLine("Parse STP File in directories");
+                        string[] filePaths = Directory.GetFiles(args[0], "*.stp",
+                                         SearchOption.TopDirectoryOnly);
+                        if(filePaths != null && filePaths.Length > 0)
+                        {
+                            foreach(string filePath in filePaths)
+                            {
+                                ParseStepFile(filePath, ref countSuccess);
+                            }
+                            Console.WriteLine(string.Format("\nParse result: {0}/{1} successes", countSuccess, filePaths.Length));
+                            if(_failedFiles.Count > 0)
+                            {
+                                Console.WriteLine(string.Format("Failed files:"));
+                                foreach (string failedFile in _failedFiles)
+                                {
+                                    Console.WriteLine(failedFile);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("No STP Files found in directories");
+                        }
                     }
-
-                    XmlDocument doc = new XmlDocument();
-                    XmlNode docNode = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
-
-                    Console.WriteLine("Writing XML file...");
-                    XmlWriterSettings settings = new XmlWriterSettings
+                    else if (File.Exists(args[0]))
                     {
-                        ConformanceLevel = ConformanceLevel.Fragment,
-                        Indent = true,
-                        IndentChars = "    ",
-                        OmitXmlDeclaration = false,
-                        CloseOutput = false,
-                        Encoding = Encoding.Unicode
-                    };
-                    XmlWriter xmlWriter = XmlWriter.Create(onlyPath + "/" + fileName + ".xml", settings);
-                    StepWriter stepWriter = new StepWriter(stepFile, false, xmlWriter);
-                    stepWriter.Save();
-
-                    xmlWriter.Flush();
-                    xmlWriter.Close();
-
-                    Console.WriteLine("Success!");
+                        ParseStepFile(args[0], ref countSuccess);
+                    }
+                    else
+                    {
+                        Console.WriteLine("File Not Exists");
+                        LogWriter.Instance.WriteInfoLog("File Not Exists");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("File Not Exists");
+                    Console.WriteLine("No STP File found");
+                    LogWriter.Instance.WriteInfoLog("No STP File found");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("No STP File found");
+                Console.WriteLine(ex.Message);
+                LogWriter.Instance.WriteErrorLog(ex);
+            }
+        }
+
+        private static void ParseStepFile(string fileInput, ref int countSuccess)
+        {
+            string fileName = string.Empty;
+            try
+            {
+                string fullPath = Path.GetFullPath(fileInput);
+                string onlyPath = Directory.GetParent(fullPath).FullName;
+                fileName = Path.GetFileNameWithoutExtension(fileInput);
+                Console.WriteLine("Loading STP file... " + fileName);
+                LogWriter.Instance.WriteInfoLog("Loading STP file... " + fileName);
+                StepFile stepFile;
+                using (FileStream fs = new FileStream(fullPath, FileMode.Open))
+                {
+                    stepFile = StepFile.Load(fs);
+                }
+
+                XmlDocument doc = new XmlDocument();
+                XmlNode docNode = doc.CreateXmlDeclaration("1.0", "UTF-8", null);
+
+                Console.WriteLine("Writing XML file...");
+                XmlWriterSettings settings = new XmlWriterSettings
+                {
+                    ConformanceLevel = ConformanceLevel.Fragment,
+                    Indent = true,
+                    IndentChars = "    ",
+                    OmitXmlDeclaration = false,
+                    CloseOutput = false,
+                    Encoding = Encoding.Unicode
+                };
+                XmlWriter xmlWriter = XmlWriter.Create(onlyPath + "/" + fileName + ".xml", settings);
+                StepWriter stepWriter = new StepWriter(stepFile, false, xmlWriter);
+                stepWriter.Save();
+
+                xmlWriter.Flush();
+                xmlWriter.Close();
+
+                Console.WriteLine("Success!");
+                LogWriter.Instance.WriteInfoLog("Success!");
+                countSuccess++;
+            }
+            catch (Exception ex)
+            {
+                _failedFiles.Add(fileName);
+                LogWriter.Instance.WriteErrorLog(ex);
+                Console.WriteLine("Failed to parse file " + fileName + " " + ex.Message);
             }
         }
     }

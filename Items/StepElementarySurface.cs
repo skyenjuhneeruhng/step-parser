@@ -34,21 +34,6 @@ namespace StepParser.Items
             Position = position;
         }
 
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            yield return Position;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(Position);
-        }
-
         internal override void WriteXML(XmlWriter writer)
         {
             writer.WriteStartElement("Position");

@@ -9,22 +9,6 @@ namespace StepParser.Items
     {
         public override StepItemType ItemType => StepItemType.Circle;
 
-        private StepAxis2Placement _position;
-
-        public StepAxis2Placement Position
-        {
-            get { return _position; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException();
-                }
-
-                _position = value;
-            }
-        }
-
         public double Radius { get; set; }
 
         private StepCircle()
@@ -32,52 +16,32 @@ namespace StepParser.Items
         {
         }
 
-        public StepCircle(string label, StepAxis2Placement position, double radius)
-            : base(label)
-        {
-            Position = position;
-            Radius = radius;
-        }
-
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            yield return Position;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(Position);
-            yield return new StepRealSyntax(Radius);
-        }
-
         internal static StepCircle CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var circle = new StepCircle();
+            circle.SyntaxList = syntaxList;
             circle.Id = id;
             syntaxList.AssertListCount(3);
             circle.Name = syntaxList.Values[0].GetStringValue();
-            binder.BindValue(syntaxList.Values[1], v => circle.Position = v.AsType<StepAxis2Placement>());
+            circle.BindSyntaxList(binder, syntaxList, 1, 2);
             circle.Radius = syntaxList.Values[2].GetRealVavlue();
             return circle;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
+            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+
             writer.WriteStartElement("Type");
             writer.WriteString(ItemType.GetItemTypeElementString());
             writer.WriteEndElement();
 
-            writer.WriteStartElement("Position");
-            _position.WriteXML(writer);
-            writer.WriteEndElement();
+            base.WriteXML(writer);
 
             writer.WriteStartElement("Radius");
             writer.WriteString(Radius.ToString());
+            writer.WriteEndElement();
+
             writer.WriteEndElement();
         }
     }

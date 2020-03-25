@@ -1,5 +1,6 @@
 ﻿using StepParser.Items;
 using StepParser.Syntax;
+using StepParser.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -35,6 +36,7 @@ namespace StepParser
                 result = Item as TItemType;
                 if (result == null)
                 {
+                    LogWriter.Instance.WriteErrorLog("Unexpected type " + " item id = " + Item.Id + " ItemStyle " + Item.ItemType.ToString());
                     throw new StepReadException("Unexpected type", CreatingSyntax.Line, CreatingSyntax.Column);
                 }
             }

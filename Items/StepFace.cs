@@ -12,15 +12,5 @@ namespace StepParser.Items
             : base(name, 0)
         {
         }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return new StepSyntaxList(Bounds.Select(b => writer.GetItemSyntax(b)));
-        }
     }
 }

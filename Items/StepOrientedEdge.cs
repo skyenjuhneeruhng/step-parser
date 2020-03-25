@@ -40,30 +40,11 @@ namespace StepParser.Items
             Orientation = orientation;
         }
 
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            foreach (var item in base.GetReferencedItems())
-            {
-                yield return item;
-            }
-
-            yield return EdgeElement;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(EdgeElement);
-            yield return StepWriter.GetBooleanSyntax(Orientation);
-        }
 
         internal static StepOrientedEdge CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var orientedEdge = new StepOrientedEdge();
+            orientedEdge.SyntaxList = syntaxList;
             orientedEdge.Id = id;
             syntaxList.AssertListCount(5);
             orientedEdge.Name = syntaxList.Values[0].GetStringValue();

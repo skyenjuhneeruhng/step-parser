@@ -18,28 +18,14 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepFillAreaStyle CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var fillAreaStyle = new StepFillAreaStyle();
+            fillAreaStyle.SyntaxList = syntaxList;
             syntaxList.AssertListCount(2);
             fillAreaStyle.Id = id;
             fillAreaStyle.Name = syntaxList.Values[0].GetStringValue();
-
-            //var referList = syntaxList.Values[1].GetValueList();
-            //fillAreaStyle.FillAreaStyleColours.Clear();
-            //fillAreaStyle.FillAreaStyleColours.AddRange(Enumerable.Range(0, referList.Values.Count).Select(_ => (StepFillAreaStyleColour)null));
-            //for (int i = 0; i < referList.Values.Count; i++)
-            //{
-            //    var j = i;
-            //    binder.BindValue(referList.Values[j], v => fillAreaStyle.FillAreaStyleColours[j] = v.AsType<StepFillAreaStyleColour>());
-            //}
+            
             fillAreaStyle.BindSyntaxList(binder, syntaxList, 1);
             return fillAreaStyle;
         }

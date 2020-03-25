@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
 using StepParser.Syntax;
+using StepParser.ViewModel;
 
 namespace StepParser.Items
 {
@@ -16,16 +18,35 @@ namespace StepParser.Items
 
         public string Keyword { get; set; }
 
-        public Dictionary<string, List<object>> RefObjs { get; set; }
+        public Dictionary<string, List<StepRepresentationItem>> RefChildItems { get; set; }
+        public List<StepRepresentationItem> RefParentItems { get; set; }
 
-        public List<object> UnRefObj { get; set; }
+        public List<object> UnRefObjs { get; set; }
+
+        internal StepSyntaxList SyntaxList { get; set; }
+
+        private int _count = 0;
+        public int Count { get => _count; set => _count = value; }
+
+        public bool IsCrossRef { get; set; }
+
+        public bool ContainCrossRef { get; set; }
+
+        public List<StepRepresentationItem> ParentItems { get; set; }
+
+        public List<StepRepresentationItem> ChildItems { get; set; }
 
         protected StepRepresentationItem(string name, int id)
         {
             Name = name;
             Id = id;
-            RefObjs = new Dictionary<string, List<object>>();
-            UnRefObj = new List<object>();
+            RefChildItems = new Dictionary<string, List<StepRepresentationItem>>();
+            UnRefObjs = new List<object>();
+            IsCrossRef = false;
+            ContainCrossRef = true;
+            ParentItems = new List<StepRepresentationItem>();
+            ChildItems = new List<StepRepresentationItem>();
+            RefParentItems = new List<StepRepresentationItem>();
         }
 
         internal virtual IEnumerable<StepRepresentationItem> GetReferencedItems()
@@ -40,55 +61,103 @@ namespace StepParser.Items
 
         internal virtual void WriteXML(XmlWriter writer)
         {
-            foreach (var obj in RefObjs)
+            try
             {
-                if (obj.Value != null && obj.Value.Count > 0)
+
+                foreach (var obj in UnRefObjs)
                 {
-                    if(obj.Value.Count > 1)
-                        writer.WriteStartElement(obj.Key.ToString()+"s"); 
-                    foreach (var item in obj.Value)
+                    if (obj is StepSyntax)
                     {
-                        if (item != null)
+                        StepSyntax stepSyntax = obj as StepSyntax;
+                        try
                         {
-                            if (item is StepRepresentationItem)
+                            writer.WriteStartElement(stepSyntax.SyntaxType.ToString());
+                            if (obj is StepStringSyntax)
+                                writer.WriteAttributeString("value", stepSyntax.GetStringValue());
+                            if (obj is StepRealSyntax)
+                                writer.WriteAttributeString("value", stepSyntax.GetRealVavlue().ToString());
+                            if (obj is StepIntegerSyntax)
+                                writer.WriteAttributeString("value", stepSyntax.GetIntegerValue().ToString());
+                            if (obj is StepEnumerationValueSyntax)
+                                writer.WriteAttributeString("value", stepSyntax.GetEnumerationValue().ToString());
+                            writer.WriteEndElement();
+                        }
+                        catch (Exception ex)
+                        {
+                            LogWriter.Instance.WriteErrorLog(ex + " step syntax type " + stepSyntax.SyntaxType.ToString());
+                        }
+                    }
+                }
+                foreach (var obj in RefChildItems)
+                {
+                    if (obj.Value != null && obj.Value.Count > 0)
+                    {
+                        if (obj.Value.Count > 1)
+                            writer.WriteStartElement(obj.Key.ToString() + "s");
+                        foreach (var item in obj.Value)
+                        {
+                            if (item != null)
                             {
-                                if (((StepRepresentationItem)item).ItemType == StepItemType.Unknown)
+                                if (item is StepRepresentationItem)
                                 {
-                                    writer.WriteStartElement(ToCamel(((StepRepresentationItem)item).Keyword));
-                                    writer.WriteAttributeString("id", '#' + ((StepRepresentationItem)item).Id.ToString());
-                                    ((StepRepresentationItem)item).WriteXML(writer);
-                                    writer.WriteEndElement();
+                                    if (((StepRepresentationItem)item).ItemType == StepItemType.Unknown)
+                                    {
+                                        writer.WriteStartElement(((StepRepresentationItem)item).GetStepItemTypeStr());
+                                        writer.WriteAttributeString("id", '#' + ((StepRepresentationItem)item).Id.ToString());
+                                        ((StepRepresentationItem)item).WriteXML(writer);
+                                        writer.WriteEndElement();
+                                    }
+                                    else
+                                    {
+                                        ((StepRepresentationItem)item).WriteXML(writer);
+                                    }
                                 }
                                 else
                                 {
-                                    ((StepRepresentationItem)item).WriteXML(writer);
+                                    Debug.WriteLine($"Unsupported writexlm for item {item.ToString()}");
                                 }
                             }
-                            else
-                            {
-                                Debug.WriteLine($"Unsupported writexlm for item {item.ToString()}");
-                            }
                         }
+                        if (obj.Value.Count > 1)
+                            writer.WriteEndElement();
                     }
-                    if (obj.Value.Count > 1)
-                        writer.WriteEndElement();
                 }
+            }
+            catch (Exception ex)
+            {
+                LogWriter.Instance.WriteErrorLog(ex);
             }
         }
 
         public void AddRefObjs(StepRepresentationItem item)
         {
-            string key = item.ItemType == StepItemType.Unknown ? ToCamel(item.Keyword) : item.ItemType.ToString();
-            if (!RefObjs.ContainsKey(key))
+            try
             {
-                List<object> list = new List<object>();
-                list.Add(item);
-                RefObjs.Add(key, list);
+                if(item != null)
+                {
+                    string key = item.ItemType == StepItemType.Unknown ? ToCamel(item.Keyword) : item.ItemType.ToString();
+                    if (!RefChildItems.ContainsKey(key))
+                    {
+                        List<StepRepresentationItem> list = new List<StepRepresentationItem>();
+                        list.Add(item);
+                        RefChildItems.Add(key, list);
+                    }
+                    else
+                    {
+                        List<StepRepresentationItem> list = RefChildItems[key];
+                        list.Add(item);
+                    }
+                    if (item.RefParentItems.Find(x => x.Id == Id) == null)
+                        item.RefParentItems.Add(this);
+                }
+                else
+                {
+                    //do nothing
+                }
             }
-            else
+            catch (Exception ex)
             {
-                List<object> list = RefObjs[key];
-                list.Add(item);
+                LogWriter.Instance.WriteErrorLog(ex);
             }
         }
 
@@ -107,17 +176,7 @@ namespace StepParser.Items
                 {
                     if (stepSyntax.SyntaxType == StepSyntaxType.List)
                     {
-                        var refers = stepSyntax.GetValueList();
-                        foreach (var refer in refers.Values)
-                        {
-                            if (refer is StepSimpleItemSyntax || refer is StepEntityInstanceReferenceSyntax || refer is StepAutoSyntax)
-                                binder.BindValue(refer, v => AddRefObjs(v.Item));
-                            else
-                            {
-                                UnRefObj.Add(refer);
-                                //Debug.WriteLine($"Unsupported binding for syntax {referList.Values[j].SyntaxType} at {referList.Values[j].Line}, {referList.Values[j].Column}, {dynamicItem.Keyword}, {dynamicItem.Id}");
-                            }
-                        }
+                        BindSyntaxList(binder, (StepSyntaxList)stepSyntax, 0);
                     }
                     else
                     {
@@ -125,8 +184,7 @@ namespace StepParser.Items
                             binder.BindValue(stepSyntax, v => AddRefObjs(v.Item));
                         else
                         {
-                            UnRefObj.Add(stepSyntax);
-                            //Debug.WriteLine($"Unsupported binding for syntax {stepSyntax.SyntaxType} at {stepSyntax.Line}, {stepSyntax.Column}, {dynamicItem.Keyword}, {dynamicItem.Id} ");
+                            UnRefObjs.Add(stepSyntax);
                         }
                     }
                 }
@@ -134,6 +192,70 @@ namespace StepParser.Items
             }
         }
 
+        /// <summary>
+        /// WriteXMLGroup
+        /// </summary>
+        /// <param name="writer"></param>
+        public virtual void WriteXMLGroup(XmlWriter writer)
+        {
+            if (RefChildItems.Count > 0)
+            {
+                foreach (var obj in RefChildItems)
+                {
+                    if (obj.Value != null && obj.Value.Count > 0)
+                    {
+                        if (obj.Value.Count > 1)
+                        {
+                            writer.WriteStartElement("Group");
+                            writer.WriteAttributeString("id", "#" + Id.ToString());
+                            writer.WriteAttributeString("name", Name);
+                        }
+                        foreach (var item in obj.Value)
+                        {
+                            if (item != null)
+                            {
+                                if (item is StepRepresentationItem)
+                                {
+                                    ((StepRepresentationItem)item).WriteXMLGroup(writer);
+                                }
+                                else
+                                {
+                                    Debug.WriteLine($"Unsupported writexlm for item {item.ToString()}");
+                                }
+                            }
+                        }
+                        if (obj.Value.Count > 1)
+                            writer.WriteEndElement();
+                    }
+                }
+            }
+            else
+            {
+                writer.WriteStartElement("Part");
+                writer.WriteAttributeString("id", "#" + Id.ToString());
+                writer.WriteAttributeString("name", Name);
+                writer.WriteEndElement();
+            }
+            writer.WriteEndElement();
+        }
+
+        public virtual void WriteXMLOrderPart(XmlWriter writer)
+        {
+            
+        }
+
+
+        /// <summary>
+        /// GetStepItemTypeStr
+        /// </summary>
+        /// <returns></returns>
+        internal string GetStepItemTypeStr()
+        {
+            if (ItemType == StepItemType.Unknown)
+                return new CultureInfo("en").TextInfo.ToTitleCase(Keyword.ToLower().Replace("_", " ")).Replace(" ", "");
+            else
+                return ItemType.ToString();
+        }
 
         internal static string ToCamel(string input)
         {

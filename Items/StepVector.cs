@@ -38,25 +38,10 @@ namespace StepParser.Items
             Length = length;
         }
 
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            yield return Direction;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(Direction);
-            yield return new StepRealSyntax(Length);
-        }
-
         internal static StepVector CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
         {
             var vector = new StepVector();
+            vector.SyntaxList = syntaxList;
             syntaxList.AssertListCount(3);
             vector.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => vector.Direction = v.AsType<StepDirection>());

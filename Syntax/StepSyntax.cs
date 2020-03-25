@@ -6,7 +6,6 @@ namespace StepParser.Syntax
     internal abstract class StepSyntax
     {
         public abstract StepSyntaxType SyntaxType { get; }
-
         public int Line { get; }
         public int Column { get; }
 

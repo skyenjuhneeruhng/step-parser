@@ -17,16 +17,10 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepPresentationStyleAssignment CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var presentationStyleAssignment = new StepPresentationStyleAssignment();
+            presentationStyleAssignment.SyntaxList = syntaxList;
             syntaxList.AssertListCount(1);
             presentationStyleAssignment.Id = id;
             presentationStyleAssignment.BindSyntaxList(binder, syntaxList, 0);

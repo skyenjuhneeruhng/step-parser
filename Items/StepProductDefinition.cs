@@ -9,24 +9,6 @@ namespace StepParser.Items
     public class StepProductDefinition : StepComponentAssemble
     {
         public override StepItemType ItemType => StepItemType.ProductDefinition;
-        public StepProductDefFormationWithSpecSource DefinitionFormation { get; set; }
-        private List<StepProductDefinition> _children;
-        public int Count { get; set; } = 0;
-
-        public List<StepProductDefinition> Children
-        {
-            get { return _children; }
-            set
-            {
-                if (value == null)
-                {
-                    throw new ArgumentNullException();
-                }
-
-                _children = value;
-            }
-        }
-
 
         public StepProductDefinition(string name, int id)
             : base(name, id)
@@ -38,45 +20,38 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepProductDefinition CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var productDefinition = new StepProductDefinition();
+            productDefinition.SyntaxList = syntaxList;
             syntaxList.AssertListCount(4);
             productDefinition.Id = id;
             productDefinition.Name = syntaxList.Values[0].GetStringValue();
             productDefinition.Description = syntaxList.Values[1].GetStringValue();
 
-            binder.BindValue(syntaxList.Values[2], v => productDefinition.DefinitionFormation = v.AsType<StepProductDefFormationWithSpecSource>());
+            productDefinition.BindSyntaxList(binder, syntaxList, 1);
 
             return productDefinition;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            if (DefinitionFormation != null)
-            {
-                DefinitionFormation.WriteXML(writer);
-            }            
+            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+            writer.WriteAttributeString("id", "#"+Id.ToString());
+            base.WriteXML(writer);
+            writer.WriteEndElement();
         }
 
-        public void WriteXMLGroup(XmlWriter writer)
+        public override void WriteXMLGroup(XmlWriter writer)
         {
-            if (_children.Count > 0)
+            if(ChildItems.Count > 0)
             {
                 writer.WriteStartElement("Group");
-                //writer.WriteAttributeString("id", "#" + Id.ToString());
-                //writer.WriteAttributeString("name", Name);
-                DefinitionFormation.WriteXMLGroup(writer);
-                foreach (var child in _children)
+                writer.WriteAttributeString("id", "#" + GetShapeDefinitionRepresentationId());
+                writer.WriteAttributeString("name", Name);
+                foreach (var item in ChildItems)
                 {
-                    child.WriteXMLGroup(writer);
+                    item.WriteXMLGroup(writer);
                 }
                 writer.WriteEndElement();
             }
@@ -84,34 +59,46 @@ namespace StepParser.Items
             {
                 Count++;
                 writer.WriteStartElement("Part");
-                //writer.WriteAttributeString("id", "#" + Id.ToString());
-                //writer.WriteAttributeString("name", Name);
-                DefinitionFormation.WriteXMLGroup(writer);
+                writer.WriteAttributeString("id", "#" + GetShapeDefinitionRepresentationId());
+                writer.WriteAttributeString("name", Name);
                 writer.WriteEndElement();
             }
         }
 
-        public void WriteXMLOroderPart(XmlWriter writer)
+        public override void WriteXMLOrderPart(XmlWriter writer)
         {
-            if (Count > 0)
+            if (ChildItems.Count > 0)
             {
-                writer.WriteStartElement("OrderPart");
-                writer.WriteAttributeString("Amount", Count.ToString());
-                DefinitionFormation.WriteXMLOroderPart(writer);
-                writer.WriteEndElement();
-            }
-        }
-
-        public bool HasProduct(StepProductDefinition item)
-        {
-            foreach (var child in _children)
-            {
-                if (child.Id == item.Id)
+                foreach (var item in ChildItems)
                 {
-                    return true;
+                    item.WriteXMLOrderPart(writer);
                 }
             }
-            return false;
+            else
+            {
+                if (Count > 0)
+                {
+                    writer.WriteStartElement("OrderPart");
+                    writer.WriteAttributeString("Amount", Count.ToString());
+                    writer.WriteString("#" + GetShapeDefinitionRepresentationId());
+                    writer.WriteEndElement();
+                    Count = 0;
+                }
+            }
+            
+        }
+
+        private string GetShapeDefinitionRepresentationId()
+        {
+            foreach(var refItem in RefParentItems)
+            {
+                foreach (var refParentItem in refItem.RefParentItems)
+                {
+                    if (refParentItem.GetStepItemTypeStr() == StepItemType.ShapeDefinitionRepresentation.ToString())
+                        return refParentItem.Id.ToString();
+                }
+            }
+            return "UnknowId";
         }
     }
 }

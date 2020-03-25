@@ -20,6 +20,7 @@ namespace StepParser.Items
         internal static StepCartesianPoint CreateFromSyntaxList(StepSyntaxList syntaxList, int id)
         {
             var item = new StepCartesianPoint();
+            item.SyntaxList = syntaxList;
             item.Id = id;
             return (StepCartesianPoint)AssignTo(item, syntaxList);
         }

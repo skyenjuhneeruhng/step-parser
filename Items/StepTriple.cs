@@ -27,20 +27,6 @@ namespace StepParser.Items
             Z = z;
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return new StepSyntaxList(
-                new StepRealSyntax(X),
-                new StepRealSyntax(Y),
-                new StepRealSyntax(Z)
-            );
-        }
-
         internal static StepTriple AssignTo(StepTriple triple, StepSyntaxList values)
         {
             values.AssertListCount(2);

@@ -11,67 +11,33 @@ namespace StepParser.Items
     public class StepStyledItem: StepRepresentationItem
     {
         public override StepItemType ItemType => StepItemType.StyledItem;
-        public List<StepPresentationStyleAssignment> StyleAssignments { get; set; } = new List<StepPresentationStyleAssignment>();
-
-        public StepManifoldSolidBrep _usedSolidBrep = null;
-        public StepManifoldSolidBrep UsedSolidBrep {
-            get
-            {
-                if(_usedSolidBrep == null)
-                {
-                    foreach (var obj in RefObjs)
-                    {
-                        if(obj.Value != null)
-                        {
-                            foreach (var item in obj.Value)
-                            {
-                                if (item is StepManifoldSolidBrep)
-                                {
-                                    _usedSolidBrep = (StepManifoldSolidBrep)item;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                return _usedSolidBrep;
-            }
-            set
-            {
-                _usedSolidBrep = value;
-            }
-        }
 
         private StepStyledItem()
             : base(string.Empty, 0)
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepStyledItem CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var styledItem = new StepStyledItem();
+            styledItem.SyntaxList = syntaxList;
             syntaxList.AssertListCount(3);
             styledItem.Id = id;
             styledItem.Name = syntaxList.Values[0].GetStringValue();
-
             styledItem.BindSyntaxList(binder, syntaxList, 1);
             return styledItem;
         }
 
         internal override void WriteXML(XmlWriter writer)
         {
-            foreach (var obj in RefObjs)
+            writer.WriteStartElement(GetStepItemTypeStr());
+
+            writer.WriteAttributeString("id", '#' + Id.ToString());
+            foreach (var obj in RefChildItems)
             {
                 if (obj.Value != null && obj.Value.Count > 0)
                 {
-                    if(obj.Key == StepItemType.PresentationStyleAssignment.ToString())
+                    if (obj.Key == StepItemType.PresentationStyleAssignment.ToString())
                     {
                         if (obj.Value.Count > 1)
                             writer.WriteStartElement(obj.Key.ToString() + "s");
@@ -81,7 +47,10 @@ namespace StepParser.Items
                             {
                                 if (item is StepRepresentationItem)
                                 {
+                                    writer.WriteStartElement(((StepRepresentationItem)item).GetStepItemTypeStr());
+                                    writer.WriteAttributeString("id", '#' + ((StepRepresentationItem)item).Id.ToString());
                                     ((StepRepresentationItem)item).WriteXML(writer);
+                                    writer.WriteEndElement();
                                 }
                                 else
                                 {
@@ -94,6 +63,9 @@ namespace StepParser.Items
                     }
                 }
             }
+
+            writer.WriteEndElement();
+            
         }
     }
 }

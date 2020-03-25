@@ -16,16 +16,10 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepAdvancedBrepShapeRepresentation CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var advancedBrepShapeRepresentation = new StepAdvancedBrepShapeRepresentation();
+            advancedBrepShapeRepresentation.SyntaxList = syntaxList;
             syntaxList.AssertListCount(3);
             advancedBrepShapeRepresentation.Id = id;
             advancedBrepShapeRepresentation.Name = syntaxList.Values[0].GetStringValue();
@@ -36,7 +30,10 @@ namespace StepParser.Items
 
         internal override void WriteXML(XmlWriter writer)
         {
+            writer.WriteStartElement(ItemType.GetItemTypeElementString());
+            writer.WriteAttributeString("id", '#' + Id.ToString());
             base.WriteXML(writer);
+            writer.WriteEndElement();
         }
     }
 }

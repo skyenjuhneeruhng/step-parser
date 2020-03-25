@@ -75,21 +75,5 @@ namespace StepParser
                 }
             }
         }
-
-        public void BindRelationShip(StepRepresentationItem item, Action<StepBoundItem> bindAction)
-        {
-            for(int i=0; i<_itemMap.Count; i++)
-            {
-                if (_itemMap[i] is StepShapeRepresentationRelationShip)
-                {
-                    var itemInstance = (StepShapeRepresentationRelationShip)_itemMap[i];
-                    if (itemInstance.UsedRepresentation != null && itemInstance.UsedRepresentation.Id == item.Id)
-                    {
-                        var boundItem = new StepBoundItem(_itemMap[itemInstance.Id]);
-                        bindAction(boundItem);
-                    }
-                }
-            }
-        }
     }
 }

@@ -14,16 +14,10 @@ namespace StepParser.Items
         {
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-        }
         internal static StepProduct CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var product = new StepProduct();
+            product.SyntaxList = syntaxList;
             syntaxList.AssertListCount(4);
             product.Id = id;
             product.Name = syntaxList.Values[0].GetStringValue();
@@ -45,17 +39,6 @@ namespace StepParser.Items
             writer.WriteStartElement("Description");
             writer.WriteString(Description);
             writer.WriteEndElement();
-        }
-
-        public void WriteXMLGroup(XmlWriter writer)
-        {
-            writer.WriteAttributeString("id", "#" + Id.ToString());
-            writer.WriteAttributeString("name", Name);
-        }
-
-        public void WriteXMLOroderPart(XmlWriter writer)
-        {
-            writer.WriteString("#" + Id.ToString());
         }
     }
 }

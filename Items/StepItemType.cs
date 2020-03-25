@@ -168,8 +168,11 @@ namespace StepParser.Items
                     return ColourRGBText;
                 case StepItemType.NextAssemblyUsageOccurrence:
                     return NextAssemblyUsageOccurrenceText;
+                case StepItemType.FaceSurface:
+                    return FaceSurfaceText;
                 default:
-                    throw new InvalidOperationException("Unexpected item type " + type);
+                    return type.ToString();
+                    //throw new InvalidOperationException("Unexpected item type " + type);
             }
         }
 

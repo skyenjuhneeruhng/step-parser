@@ -15,6 +15,7 @@ namespace StepParser.Items
 
     public class StepBSplineCurveWithKnots : StepBSplineCurve
     {
+        public override StepItemType ItemType => StepItemType.BSplineCurveWithKnots;
         public List<int> KnotMultiplicities { get; } = new List<int>();
 
         public List<double> Knots { get; } = new List<double>();
@@ -30,8 +31,6 @@ namespace StepParser.Items
             : base(name, controlPoints)
         {
         }
-
-        public override StepItemType ItemType => StepItemType.BSplineCurveWithKnots;
 
         private const string UNIFORM_KNOTS = "UNIFORM_KNOTS";
         private const string QUASI_UNIFORM_KNOTS = "QUASI_UNIFORM_KNOTS";
@@ -70,34 +69,18 @@ namespace StepParser.Items
             throw new NotImplementedException();
         }
 
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return new StepSyntaxList(KnotMultiplicities.Select(m => new StepIntegerSyntax(m)));
-            yield return new StepSyntaxList(Knots.Select(k => new StepRealSyntax(k)));
-            yield return new StepEnumerationValueSyntax(GetKnotSpec(KnotSpec));
-        }
-
         internal static StepBSplineCurveWithKnots CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             syntaxList.AssertListCount(9);
             var controlPointsList = syntaxList.Values[2].GetValueList();
 
             var spline = new StepBSplineCurveWithKnots(string.Empty, new StepCartesianPoint[controlPointsList.Values.Count]);
+            spline.SyntaxList = syntaxList;
             spline.Id = id;
             spline.Name = syntaxList.Values[0].GetStringValue();
             spline.Degree = syntaxList.Values[1].GetIntegerValue();
-
-            for (int i = 0; i < controlPointsList.Values.Count; i++)
-            {
-                var j = i; // capture to avoid rebinding
-                binder.BindValue(controlPointsList.Values[j], v => spline.ControlPointsList[j] = v.AsType<StepCartesianPoint>());
-            }
-            //spline.BindSyntaxList(binder, syntaxList, 2, 3);
+            
+            spline.BindSyntaxList(binder, syntaxList, 2, 3);
 
             spline.CurveForm = ParseCurveForm(syntaxList.Values[3].GetEnumerationValue());
             spline.ClosedCurve = syntaxList.Values[4].GetBooleanValue();

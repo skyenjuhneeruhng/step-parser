@@ -36,24 +36,10 @@ namespace StepParser.Items
             Location = location;
         }
 
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            yield return Location;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(Location);
-        }
-
         internal static StepVertexPoint CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList)
         {
             var vertex = new StepVertexPoint();
+            vertex.SyntaxList = syntaxList;
             syntaxList.AssertListCount(2);
             vertex.Name = syntaxList.Values[0].GetStringValue();
             binder.BindValue(syntaxList.Values[1], v => vertex.Location = v.AsType<StepCartesianPoint>());

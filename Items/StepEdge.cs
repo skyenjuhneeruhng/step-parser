@@ -23,30 +23,6 @@ namespace StepParser.Items
             EdgeEnd = edgeEnd;
         }
 
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            if (EdgeStart != null)
-            {
-                yield return EdgeStart;
-            }
-
-            if (EdgeEnd != null)
-            {
-                yield return EdgeEnd;
-            }
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntaxOrAuto(EdgeStart);
-            yield return writer.GetItemSyntaxOrAuto(EdgeEnd);
-        }
-
         internal override void WriteXML(XmlWriter writer)
         {
             // Start Point

@@ -40,31 +40,11 @@ namespace StepParser.Items
             EdgeGeometry = edgeGeometry;
             IsSameSense = isSameSense;
         }
-
-        internal override IEnumerable<StepRepresentationItem> GetReferencedItems()
-        {
-            foreach (var item in base.GetReferencedItems())
-            {
-                yield return item;
-            }
-
-            yield return EdgeGeometry;
-        }
-
-        internal override IEnumerable<StepSyntax> GetParameters(StepWriter writer)
-        {
-            foreach (var parameter in base.GetParameters(writer))
-            {
-                yield return parameter;
-            }
-
-            yield return writer.GetItemSyntax(EdgeGeometry);
-            yield return StepWriter.GetBooleanSyntax(IsSameSense);
-        }
-
+        
         internal static StepEdgeCurve CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var edgeCurve = new StepEdgeCurve();
+            edgeCurve.SyntaxList = syntaxList;
             edgeCurve.Id = id;
             syntaxList.AssertListCount(5);
             edgeCurve.Name = syntaxList.Values[0].GetStringValue();

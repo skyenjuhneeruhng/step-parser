@@ -20,6 +20,7 @@ namespace StepParser.Items
         internal static StepPlane CreateFromSyntaxList(StepBinder binder, StepSyntaxList syntaxList, int id)
         {
             var plane = new StepPlane();
+            plane.SyntaxList = syntaxList;
             plane.Id = id;
             syntaxList.AssertListCount(2);
             plane.Name = syntaxList.Values[0].GetStringValue();

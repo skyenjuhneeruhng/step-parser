@@ -2,7 +2,7 @@
   "profiles": {
     "StepParser": {
       "commandName": "Project",
-      "commandLineArgs": "\"E:\\PROJECTS\\OUTSOURCE\\step_parser_test\\Data\\z16.011.600.MBT_Wendevorrichtung Zus.stp\"",
+      "commandLineArgs": "\"E:\\PROJECTS\\OUTSOURCE\\step_parser_test\\Documents\"",
       "nativeDebugging": true
     }
   }
