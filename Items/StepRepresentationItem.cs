@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
-using BaseLibrary.Base;
 using StepParser.Base;
 using StepParser.Syntax;
 using StepParser.ViewModel;

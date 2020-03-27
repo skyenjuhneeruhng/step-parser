@@ -2,7 +2,7 @@
   "profiles": {
     "StepParser": {
       "commandName": "Project",
-      "commandLineArgs": "\"E:\\PROJECTS\\OUTSOURCE\\step_parser_test\\Documents\"",
+      "commandLineArgs": "\"E:\\2020Tasks\\202001\\20200123stpconverterc#\\result\\0318\\Data\"",
       "nativeDebugging": true
     }
   }
