@@ -163,12 +163,16 @@ namespace StepParser
                 {
                     StepRepresentationItem item = _file.Items[idx];
                     UpdateBindStyleItems(item, stepStyleItems);
-                    if (item.GetStepItemTypeStr() == StepItemType.NextAssemblyUsageOccurrence.ToString())
+                    if (item.GetStepItemTypeStr() == StepItemType.ProductDefinition.ToString())
+                    {
+                        AddRelatedItems(item);
+                    }
+                    else if (item.GetStepItemTypeStr() == StepItemType.NextAssemblyUsageOccurrence.ToString())
                     {
                         ((StepNextAssemblyUsageOccrrence)item).Parent.ChildItems.Add(((StepNextAssemblyUsageOccrrence)item).Child);
                         ((StepNextAssemblyUsageOccrrence)item).Child.ParentItems.Add(((StepNextAssemblyUsageOccrrence)item).Parent);
-                        AddRelatedItems(((StepNextAssemblyUsageOccrrence)item).Child);
-                        AddRelatedItems(((StepNextAssemblyUsageOccrrence)item).Parent);
+                        AddRelatedItems(((StepNextAssemblyUsageOccrrence)item).Child); //this is ProductDefinition item
+                        AddRelatedItems(((StepNextAssemblyUsageOccrrence)item).Parent); //this is ProductDefinition item
                     }
                     else if (item.GetStepItemTypeStr() == StepItemType.ShapeDefinitionRepresentation.ToString())
                     {

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml;
+using BaseLibrary.Base;
+using StepParser.Base;
 using StepParser.Syntax;
 using StepParser.ViewModel;
 
@@ -14,7 +16,20 @@ namespace StepParser.Items
 
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        private string _name = string.Empty;
+        public string Name
+        {
+            get { return _name; }
+            set { 
+                if(!string.IsNullOrEmpty(value))
+                {
+                    _name = Utils.FromStringToReadableString(value);
+                }
+                else
+                    _name = value; 
+            }
+        }
+
 
         public string Keyword { get; set; }
 
@@ -71,16 +86,27 @@ namespace StepParser.Items
                         StepSyntax stepSyntax = obj as StepSyntax;
                         try
                         {
-                            writer.WriteStartElement(stepSyntax.SyntaxType.ToString());
                             if (obj is StepStringSyntax)
-                                writer.WriteAttributeString("value", stepSyntax.GetStringValue());
-                            if (obj is StepRealSyntax)
-                                writer.WriteAttributeString("value", stepSyntax.GetRealVavlue().ToString());
-                            if (obj is StepIntegerSyntax)
-                                writer.WriteAttributeString("value", stepSyntax.GetIntegerValue().ToString());
-                            if (obj is StepEnumerationValueSyntax)
-                                writer.WriteAttributeString("value", stepSyntax.GetEnumerationValue().ToString());
-                            writer.WriteEndElement();
+                            {
+                                string output = Utils.FromStringToReadableString(stepSyntax.GetStringValue());
+                                if(!string.IsNullOrEmpty(output)) {
+                                    writer.WriteStartElement(stepSyntax.SyntaxType.ToString());
+                                    writer.WriteAttributeString("value", Utils.FromStringToReadableString(stepSyntax.GetStringValue()));
+                                    writer.WriteEndElement();
+                                }
+                            }
+                            else
+                            {
+                                writer.WriteStartElement(stepSyntax.SyntaxType.ToString());
+                                if (obj is StepRealSyntax)
+                                    writer.WriteAttributeString("value", stepSyntax.GetRealVavlue().ToString());
+                                if (obj is StepIntegerSyntax)
+                                    writer.WriteAttributeString("value", stepSyntax.GetIntegerValue().ToString());
+                                if (obj is StepEnumerationValueSyntax)
+                                    writer.WriteAttributeString("value", stepSyntax.GetEnumerationValue().ToString());
+                                writer.WriteEndElement();
+                            }
+                            
                         }
                         catch (Exception ex)
                         {
