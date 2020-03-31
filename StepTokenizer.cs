@@ -1,4 +1,5 @@
 ﻿using StepParser.Tokens;
+using StepParser.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,9 +15,12 @@ namespace StepParser
         private int _offset;
         private int _currentLineNumber;
         private int _currentColumn;
-
         public int CurrentLine => _currentLineNumber;
         public int CurrentColumn => _currentColumn;
+
+
+        private bool _isFailed = false;
+        public bool IsFailed { get => _isFailed; set => _isFailed = value; }
 
         public StepTokenizer(Stream stream)
         {
@@ -178,7 +182,11 @@ namespace StepParser
                 }
                 else
                 {
-                    throw new StepReadException($"Unexpected character '{c}'", _currentLineNumber, _currentColumn);
+                    LogWriter.Instance.WriteErrorLog(string.Format("Unexpected character {0} line {1}, col {2} \nCurrent string: {3}", c.ToString(), _currentLineNumber, _currentColumn, _currentLine));
+                    //throw new StepReadException($"Unexpected character '{c}'", _currentLineNumber, _currentColumn);
+                    _isFailed = true;
+                    Advance();
+                    yield return new StepStringToken(c.ToString(), tokenLine, tokenColumn);
                 }
 
                 SwallowWhitespace();

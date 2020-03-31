@@ -170,9 +170,10 @@ namespace StepParser.Items
                     else
                     {
                         List<StepRepresentationItem> list = RefChildItems[key];
-                        list.Add(item);
+                        if(list.Find(x => x == item) == null)
+                            list.Add(item);
                     }
-                    if (item.RefParentItems.Find(x => x.Id == Id) == null)
+                    if (item.RefParentItems.Find(x => x == this) == null)
                         item.RefParentItems.Add(this);
                 }
                 else
@@ -207,6 +208,10 @@ namespace StepParser.Items
                     {
                         if (stepSyntax is StepSimpleItemSyntax || stepSyntax is StepEntityInstanceReferenceSyntax || stepSyntax is StepAutoSyntax)
                             binder.BindValue(stepSyntax, v => AddRefObjs(v.Item));
+                        else if (stepSyntax is StepComplexItemSyntax)
+                        {
+                            var stepComplexSyntax = stepSyntax as StepComplexItemSyntax;
+                        }
                         else
                         {
                             UnRefObjs.Add(stepSyntax);

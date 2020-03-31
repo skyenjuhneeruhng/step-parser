@@ -9,10 +9,10 @@ namespace StepParser
 {
     internal class StepBinder
     {
-        private Dictionary<int, StepRepresentationItem> _itemMap;
+        private Dictionary<int, List<StepRepresentationItem>> _itemMap;
         private Dictionary<int, List<Tuple<StepSyntax, Action<StepBoundItem>>>> _unboundPointers = new Dictionary<int, List<Tuple<StepSyntax, Action<StepBoundItem>>>>();
 
-        public StepBinder(Dictionary<int, StepRepresentationItem> itemMap)
+        public StepBinder(Dictionary<int, List<StepRepresentationItem>> itemMap)
         {
             _itemMap = itemMap;
         }
@@ -22,7 +22,7 @@ namespace StepParser
             if (syntax is StepSimpleItemSyntax)
             {
                 var typedParameter = (StepSimpleItemSyntax)syntax;
-                var item = StepRepresentationItem.FromTypedParameter(this, typedParameter, typedParameter.Id);
+                var item = StepRepresentationItem.FromTypedParameterToItem(this, typedParameter, typedParameter.Id);
                 var boundItem = new StepBoundItem(item, syntax);
                 bindAction(boundItem);
             }
@@ -32,8 +32,11 @@ namespace StepParser
                 if (_itemMap.ContainsKey(itemInstance.Id))
                 {
                     // pointer already defined, bind immediately
-                    var boundItem = new StepBoundItem(_itemMap[itemInstance.Id], syntax);
-                    bindAction(boundItem);
+                    foreach (var item in _itemMap[itemInstance.Id])
+                    {
+                        var boundItem = new StepBoundItem(item, syntax);
+                        bindAction(boundItem);
+                    }
                 }
                 else
                 {
@@ -67,11 +70,14 @@ namespace StepParser
                     //throw new StepReadException($"Cannot bind undefined pointer {id}", syntax.Line, syntax.Column);
                 }
 
-                var item = _itemMap[id];
-                foreach (var binder in _unboundPointers[id])
+                var items = _itemMap[id];
+                foreach(var item in items)
                 {
-                    var boundItem = new StepBoundItem(item, binder.Item1);
-                    binder.Item2(boundItem);
+                    foreach (var binder in _unboundPointers[id])
+                    {
+                        var boundItem = new StepBoundItem(item, binder.Item1);
+                        binder.Item2(boundItem);
+                    }
                 }
             }
         }

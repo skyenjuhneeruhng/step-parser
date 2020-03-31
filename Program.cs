@@ -16,6 +16,8 @@ namespace StepParser
             {
                 if (args.Length > 0)
                 {
+                    if (args.Length >= 2)
+                        LogWriter.LogLevel = int.Parse(args[1]);
                     LogWriter.Instance.WriteInfoLog("Begin parser " + Properties.Resource.BuildDate);
                     Console.WriteLine("Begin parser " + Properties.Resource.BuildDate);
                     int countSuccess = 0;
@@ -90,7 +92,7 @@ namespace StepParser
                 Console.WriteLine("Writing XML file...");
                 XmlWriterSettings settings = new XmlWriterSettings
                 {
-                    ConformanceLevel = ConformanceLevel.Fragment,
+                    ConformanceLevel = ConformanceLevel.Auto,
                     Indent = true,
                     IndentChars = "    ",
                     OmitXmlDeclaration = false,
@@ -99,7 +101,12 @@ namespace StepParser
                 };
                 XmlWriter xmlWriter = XmlWriter.Create(onlyPath + "/" + fileName + ".xml", settings);
                 StepWriter stepWriter = new StepWriter(stepFile, false, xmlWriter);
+
+                xmlWriter.WriteStartDocument(true);
+                xmlWriter.WriteStartElement("STP");
                 stepWriter.Save();
+                xmlWriter.WriteEndElement();
+                xmlWriter.WriteEndDocument();
 
                 xmlWriter.Flush();
                 xmlWriter.Close();
