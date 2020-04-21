@@ -47,8 +47,8 @@ namespace StepParser
                 // Write Parts Section
                 _xmlWriter.WriteStartElement("Parts");
                 int countPart = 0;
-                List<StepRepresentationItem> _singleItems = GetSingleGroups(_relatedItems);
-                foreach (var item in _singleItems)
+                //List<StepRepresentationItem> _singleItems = GetSingleGroups(_relatedItems);
+                foreach (var item in _relatedItems)
                 {
                     if(item.RefParentItems != null)
                     {
@@ -105,6 +105,13 @@ namespace StepParser
         {
             _xmlWriter.WriteStartElement("BasicData");
             WriteXmlElement("FileName", _file.Name);
+
+            WriteXmlElement("Author", _file.Author);
+            WriteXmlElement("Organization", _file.Organization);
+            WriteXmlElement("PreprocessorVersion", _file.PreprocessorVersion);
+            WriteXmlElement("OriginatingSystem", _file.OriginatingSystem);
+            WriteXmlElement("Authorization", _file.Authorization);
+
             WriteXmlElement("ISO", StepFile.MagicHeader);
             WriteXmlElement("Standard", _file.Description);
             WriteXmlElement("DateTime", _file.Timestamp.ToString());
@@ -206,38 +213,24 @@ namespace StepParser
         {
             foreach (var eachItem in _file.Items)
             {
-                bool isGetRelationShip = false;
                 if (inputItem == eachItem)
                     continue;
                 if (eachItem.GetStepItemTypeStr() == itemType.ToString())
                 {
-                    if(eachItem.RefChildItems.Count > 0)
+                    List<StepRepresentationItem> relatedItems = GetItemsRelationShip(inputItem, eachItem);
+                    if(relatedItems.Count > 0)
                     {
                         foreach (var refObj in eachItem.RefChildItems)
                         {
-                            if(refObj.Value != null && refObj.Value.Count > 0)
+                            if (refObj.Value != null && refObj.Value.Count > 0)
                             {
                                 foreach (var refItem in refObj.Value)
                                 {
-                                    if(!isGetRelationShip)
-                                    {
-                                        foreach (var inputRefObj in inputItem.RefChildItems)
-                                        {
-                                            if (inputRefObj.Value != null && inputRefObj.Value.Count > 0)
-                                            {
-                                                if (inputRefObj.Value.Find(x => ((StepRepresentationItem)x).Id == ((StepRepresentationItem)refItem).Id) != null)
-                                                {
-                                                    isGetRelationShip = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
+                                    if (relatedItems.Find(x => x == refItem) == null)
                                     {
                                         inputItem.AddRefObjs((StepRepresentationItem)refItem);
                                         inputItem.ContainCrossRef = true; //Contains cross ref item
-                                        ((StepRepresentationItem)refItem).IsCrossRef = true;
+                                        refItem.IsCrossRef = true;
                                     }
                                 }
                             }
@@ -245,6 +238,39 @@ namespace StepParser
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// SetShapRelationShip
+        /// </summary>
+        /// <param name="item1"></param>
+        /// <param name="itemType"></param>
+        public List<StepRepresentationItem> GetItemsRelationShip(StepRepresentationItem item1, StepRepresentationItem item2)
+        {
+            List<StepRepresentationItem> relatedItems = new List<StepRepresentationItem>();
+            foreach (var refObj2 in item2.RefChildItems)
+            {
+                if (refObj2.Value != null && refObj2.Value.Count > 0)
+                {
+                    foreach (var refItem2 in refObj2.Value)
+                    {
+                        foreach (var refObj1 in item1.RefChildItems)
+                        {
+                            if (refObj1.Value != null && refObj1.Value.Count > 0)
+                            {
+                                foreach (var refItem1 in refObj1.Value)
+                                {
+                                    if(refItem1 == refItem2)
+                                    {
+                                        relatedItems.Add(refItem1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return relatedItems;
         }
 
         /// <summary>

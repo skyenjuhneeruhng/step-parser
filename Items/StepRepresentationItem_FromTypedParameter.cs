@@ -89,9 +89,12 @@ namespace StepParser.Items
                 {
                     if (childItemSyntax is StepSimpleItemSyntax)
                     {
-                        StepRepresentationItem item = FromTypedParameterToItem(binder, childItemSyntax, id);
-                        if (item != null)
-                            retItems.Add(item);
+                        if(childItemSyntax.Parameters.Values != null && childItemSyntax.Parameters.Values.Count > 0)
+                        {
+                            StepRepresentationItem item = FromTypedParameterToItem(binder, childItemSyntax, id);
+                            if (item != null)
+                                retItems.Add(item);
+                        }
                     }
                     else
                     {

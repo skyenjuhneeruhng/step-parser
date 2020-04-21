@@ -2,7 +2,7 @@
   "profiles": {
     "StepParser": {
       "commandName": "Project",
-      "commandLineArgs": "\"E:\\PROJECTS\\OUTSOURCE\\step_parser_test\\Data\" 2",
+      "commandLineArgs": "\"E:\\PROJECTS\\OUTSOURCE\\step_parser_test\\InputA\\Konstruktion1b_dateNotConvertable.stp\"",
       "nativeDebugging": true
     }
   }

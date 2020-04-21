@@ -1,5 +1,6 @@
 ﻿using StepParser.Syntax;
 using StepParser.Tokens;
+using StepParser.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -111,6 +112,7 @@ namespace StepParser
                     MoveNext();
                     break;
                 default:
+                    LogWriter.Instance.WriteErrorLog(string.Format("Unexpected syntax token {0}", Current.Kind.ToString()));
                     ReportError($"Unexpected syntax token '{Current.Kind}'");
                     result = null; // unreachable
                     break;

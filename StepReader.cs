@@ -96,7 +96,7 @@ namespace StepParser
         {
             valueList.AssertListCount(7);
             _file.Name = valueList.Values[0].GetStringValue();
-            _file.Timestamp = valueList.Values[1].GetDateTimeValue();
+            _file.Timestamp = valueList.Values[1].GetStringValue();
             _file.Author = valueList.Values[2].GetConcatenatedStringValue();
             _file.Organization = valueList.Values[3].GetConcatenatedStringValue();
             _file.PreprocessorVersion = valueList.Values[4].GetStringValue();

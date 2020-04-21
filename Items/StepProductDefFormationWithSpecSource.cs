@@ -32,6 +32,7 @@ namespace StepParser.Items
         internal override void WriteXML(XmlWriter writer)
         {
             writer.WriteStartElement(ItemType.GetItemTypeElementString());
+            writer.WriteAttributeString("Id", "#" + Id.ToString());
             base.WriteXML(writer);
             writer.WriteEndElement();
         }

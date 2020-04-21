@@ -22,6 +22,8 @@ namespace StepParser.Base
         private static int _logLevel = (int)LOG_LEVEL_ENUM.INFO;
         public static int LogLevel { get { return _logLevel; } set { _logLevel = value; } }
 
+        public string ParsingFileName { get; set; }
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -181,7 +183,7 @@ namespace StepParser.Base
         /// <param name="w"></param>
         private void Log(LOG_LEVEL_ENUM logLevel, string logMessage, int lineNumber, string caller, string fileName, TextWriter w)
         {
-            w.WriteLine("{0} {1} {2} {3} {4} {5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), logLevel.ToString().PadRight(5), fileName.PadRight(30), caller.PadRight(35), lineNumber.ToString().PadRight(5), logMessage);
+            w.WriteLine("{0} {1} {2} {3} {4} {5}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"), logLevel.ToString().PadRight(5), fileName.PadRight(30), caller.PadRight(35), lineNumber.ToString().PadRight(5), ParsingFileName + ": " +logMessage);
         }
 
         /// <summary>

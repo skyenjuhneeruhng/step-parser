@@ -27,7 +27,16 @@ namespace StepParser
 
         // FILE_NAME values
         public string Name { get; set; }
-        public DateTime Timestamp { get; set; }
+
+        private string _timeStamp = string.Empty;
+        public string Timestamp
+        {
+            get => _timeStamp;
+            set
+            {
+                _timeStamp = value;
+            }
+        }
         public string Author { get; set; }
         public string Organization { get; set; }
         public string PreprocessorVersion { get; set; }
@@ -42,7 +51,7 @@ namespace StepParser
 
         public StepFile()
         {
-            Timestamp = DateTime.Now;
+            Timestamp = DateTime.Now.ToString();
             Schemas = new HashSet<StepSchemaTypes>();
             UnsupportedSchemas = new List<string>();
             Items = new List<StepRepresentationItem>();
@@ -115,7 +124,7 @@ namespace StepParser
                     FileNameText,
                     new StepSyntaxList(
                         new StepStringSyntax(Name),
-                        new StepStringSyntax(Timestamp.ToString("O")),
+                        new StepStringSyntax(Timestamp.ToString()),
                         new StepSyntaxList(StepWriter.SplitStringIntoParts(Author).Select(s => new StepStringSyntax(s))),
                         new StepSyntaxList(StepWriter.SplitStringIntoParts(Organization).Select(s => new StepStringSyntax(s))),
                         new StepStringSyntax(PreprocessorVersion),
